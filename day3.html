@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+    <script>
+        const calculateSpiral = (input) => {
+            let layer = 0
+            let gridSize = 1
+            let step = 1
+            let prevGridSize = 0
+
+            while (gridSize < input) {
+                layer += 1
+                step += 2
+                prevGridSize = gridSize
+                gridSize = step * step
+            }
+
+            return {
+                layer,
+                gridSize,
+                step,
+                prevGridSize
+            }
+        }
+
+        const part1 = (input) => {
+            const test = (input) => {
+                const { layer, step, gridSize, prevGridSize } = calculateSpiral(input)
+
+                let diff = layer
+
+                if (diff === 0) {
+                    return 0
+                }
+
+                let max = gridSize
+                let min
+
+                while(max > prevGridSize) {
+                    min = max - (step - 2)
+                    if (input >= min && input <= max) {
+                        let mid = max - Math.floor(step / 2)
+                        diff += Math.abs(input - mid)
+                        break
+                    }
+                    max = min - 1
+                }
+
+                return diff
+            }
+
+            console.log(test(1))
+            console.log(test(12))
+            console.log(test(23))
+            console.log(test(1024))
+            console.log(test(input))
+        }
+
+        part1(277678)
+
+        const part2 = input => {
+            const getAdjacentValues = (x, y, coordinates) => {
+                let value = 0
+                for (let i = -1; i<2; i++) {
+                    if (!coordinates.hasOwnProperty(x + i)) {
+                        continue;
+                    }
+
+                    for (let j = -1; j < 2; j++) {
+                        if (!coordinates[x + i].hasOwnProperty(y + j)) {
+                            continue;
+                        }
+                        if (coordinates[x + i][y + j]) {
+                            value += coordinates[x + i][y + j]
+                        }
+                    }
+                }
+                return value
+            }
+
+            const rotate = direction => {
+                let x = direction[1]
+                let y = -direction[0]
+                return [x, y]
+            }
+
+            const spiralTest = input => {
+                let value = 1
+                let index = 0
+                let x = 0
+                let y = 0
+                let direction = [1, 0]
+                let coordinates = {}
+
+                let rotationCounter = 0
+                let currentTurns = 1
+                let turnsToRotation = currentTurns
+
+                while(value <= input) {
+                    if (!coordinates[x]) { coordinates[x] = {} }
+                    coordinates[x][y] = value
+
+                    x += direction[0]
+                    y += direction[1]
+
+                    index += 1
+
+                    value = getAdjacentValues(x, y, coordinates)
+
+                    turnsToRotation -= 1
+
+                    if(turnsToRotation === 0) {
+                        direction = rotate(direction)
+                        ++rotationCounter
+                        turnsToRotation = (rotationCounter % 2 === 0) ? ++currentTurns : currentTurns
+                    }
+                }
+
+                return value
+            }
+
+            console.log(spiralTest(747))
+            console.log(spiralTest(input))
+        }
+
+        part2(277678)
+    </script>
+</body>
+</html>
